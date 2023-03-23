@@ -29,30 +29,52 @@ class RainbowClumpEffect {
     this.speed = speed;
     this.i = -6;
     this.rainbowStep = 0;
+    this.rainbowSpeed = 3;
   }
 
-  rainbowColor(step) {
-    let r = 0, g = 0, b = 0;
-    const pos = step % 1536;
+  rainbowColor(hue) {
+    var h = hue;
+    var s = 256; // Saturation value
+    var v = 256; // Value value
+    var hi = Math.floor(h / 43); // Calculate which section of the color wheel we're in
+    var f = (h - hi * 43) * 6; // Calculate the fractional distance between hues
 
-    if (pos < 256) {
-      r = 255 - pos;
-      g = pos;
-    } else if (pos < 512) {
-      g = 255 - (pos - 256);
-      b = pos - 256;
-    } else if (pos < 768) {
-      g = pos - 512;
-      b = 255 - (pos - 512);
-    } else if (pos < 1024) {
-      r = pos - 768;
-      b = 255 - (pos - 768);
-    } else if (pos < 1280) {
-      r = 255 - (pos - 1024);
-      b = pos - 1024;
-    } else {
-      r = pos - 1280;
-      g = 255 - (pos - 1280);
+    var p = (v * (256 - s)) >> 8;
+    var q = (v * (256 - ((s * f) >> 8))) >> 8;
+    var t = (v * (256 - ((s * (256 - f)) >> 8))) >> 8;
+
+    var r, g, b;
+    switch (hi) {
+      case 0:
+        r = v;
+        g = t;
+        b = p;
+        break;
+      case 1:
+        r = q;
+        g = v;
+        b = p;
+        break;
+      case 2:
+        r = p;
+        g = v;
+        b = t;
+        break;
+      case 3:
+        r = p;
+        g = q;
+        b = v;
+        break;
+      case 4:
+        r = t;
+        g = p;
+        b = v;
+        break;
+      case 5:
+        r = v;
+        g = p;
+        b = q;
+        break;
     }
 
     return { r, g, b };
@@ -69,7 +91,7 @@ class RainbowClumpEffect {
     }
 
     this.i = (this.i + 1) % (this.strip.pixels.length + this.clumpSize);
-    this.rainbowStep = (this.rainbowStep + 1) % 1536;
+    this.rainbowStep = (this.rainbowStep + this.rainbowSpeed) % 256;
   }
 }
 
